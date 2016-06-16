@@ -3,7 +3,6 @@
 # take it out and forget to specify security.yml, security could be turned off
 # on components in your cluster!
 - include: "{{ playbook_dir }}/playbooks/check-requirements.yml"
-
 # BASICS - we need every node in the cluster to have common software running to
 # increase stability and enable service discovery. You can look at the
 # documentation for each of these components in their README file in the
@@ -15,8 +14,17 @@
     # Consul ACLs. If you only have one datacenter, set it to that or remove
     # this variable.
     # consul_acl_datacenter: your_primary_datacenter
-
+    
+    docker_prefix: "q1docker-dev.canlab.ibm.com/"
+    install_epel_repo: false
+    docker_package_source: redhat
     consul_servers_group: role=control
+    repositories:
+      -
+        name: artifactory
+        baseurl: https://yum:APAFGo9RYkMGDPmd@q1artifactory-dev.canlab.ibm.com/qbert-rpm-snapshot-local/
+        enabled: 1
+        gpgcheck: 0
   roles:
     - common
     - lvm
@@ -27,7 +35,6 @@
     - consul
     - etcd
     - dnsmasq
-
 # ROLES - after provisioning the software that's common to all hosts, we do
 # specialized hosts. This configuration has two major groups: control nodes and
 # worker nodes. We provision the worker nodes first so that we don't create any
@@ -47,7 +54,6 @@
     zookeeper_server_group: role=control
   roles:
     - mesos
-
 # the control nodes are necessarily more complex than the worker nodes, and have
 # ZooKeeper, Mesos, and Marathon leaders. In addition, they control Vault to
 # manage secrets in the cluster. These servers do not run applications by
@@ -65,34 +71,33 @@
     - zookeeper
     - mesos
     - marathon
+    - chronos
     - mantlui
-    - kubernetes
-    - kubernetes-master
-    - kubernetes-addons
-
-- hosts: role=kubeworker
-  # role=worker hosts are a subset of "all". Since we already gathered facts on
-  # all servers, we can skip it here to speed up the deployment.
-  gather_facts: yes
-  vars:
-    consul_dns_domain: consul
-  roles:
-    - flannel
-    - kubernetes
-    - kubernetes-node
-
+    # - kubernetes
+    # - kubernetes-master
+    # - kubernetes-addons
+# - hosts: role=kubeworker
+#   # role=worker hosts are a subset of "all". Since we already gathered facts on
+#   # all servers, we can skip it here to speed up the deployment.
+#   gather_facts: yes
+#   vars:
+#     consul_dns_domain: consul
+#   roles:
+#     - flannel
+#     - kubernetes
+#     - kubernetes-node
 # The edge role exists solely for routing traffic into the cluster. Firewall
 # settings should be such that web traffic (ports 80 and 443) is exposed to the
 # world.
-- hosts: role=edge
-  gather_facts: yes
-  vars:
-    # this is the domain that traefik will match on to do host-based HTTP
-    # routing. Set it to a domain you control and add a star domain to route
-    # traffic. (EG *.marathon.localhost)
-    #
-    # For those migrating from haproxy, this variable serves the same purpose
-    # and format as `haproxy_domain`.
-    traefik_marathon_domain: marathon.localhost
-  roles:
-    - traefik
+# - hosts: role=edge
+#   gather_facts: yes
+#   vars:
+#     # this is the domain that traefik will match on to do host-based HTTP
+#     # routing. Set it to a domain you control and add a star domain to route
+#     # traffic. (EG *.marathon.localhost)
+#     #
+#     # For those migrating from haproxy, this variable serves the same purpose
+#     # and format as `haproxy_domain`.
+#     traefik_marathon_domain: marathon.localhost
+#   roles:
+#     - traefik
