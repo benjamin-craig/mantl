@@ -6,6 +6,15 @@
   changed_when: no
   tags:
     - nginx
+    
+- name: create consul nginx user
+  sudo: yes
+  user:
+    name: "{{ consul_nginx_username }}"
+    state: present
+    groups: docker
+  tags:
+    - nginx
 
 - name: set admin password variable
   set_fact:
