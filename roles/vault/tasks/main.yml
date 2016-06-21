@@ -7,6 +7,41 @@
   tags:
     - vault
     - bootstrap
+    
+- name: create vault user
+  sudo: yes
+  user:
+    name: "{{ vault_user }}"
+    state: present
+  tags:
+    - vault
+    - bootstrap
+    
+- name: create vault service over ride directory
+  sudo: yes
+  file:
+    path: /etc/systemd/system/vault.service.d
+    state: directory
+  tags:
+    - vault
+
+- name: create vault service over ride
+  sudo: yes
+  copy:
+    dest: /etc/systemd/system/vault.service.d/user.conf
+    content: |
+      [Service]
+      User={{ vault_user }}
+  notify:
+    - reload systemd daemon
+  tags:
+    - vault
+    
+- name: give vault binary cap_ipc_lock permission
+  sudo: yes
+  shell: setcap cap_ipc_lock=+ep $(readlink -f $(which vault))
+  tags:
+    - vault
 
 - name: configure vault
   sudo: yes
