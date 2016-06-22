@@ -1,4 +1,56 @@
 ---
+- name: create mesos master user
+  sudo: yes
+  user:
+    name: "{{ mesos_master_user }}"
+    state: present
+  tags:
+    - mesos
+    - bootstrap
+    
+- name: create mesos master service over ride directory
+  sudo: yes
+  file:
+    path: /etc/systemd/system/mesos-master.service.d
+    state: directory
+  tags:
+    - mesos
+    - bootstrap
+
+- name: create mesos master service over ride
+  sudo: yes
+  copy:
+    dest: /etc/systemd/system/mesos-master.service.d/user.conf
+    content: |
+      [Service]
+      User={{ mesos_master_user }}
+  notify:
+    - reload systemd daemon
+  tags:
+    - mesos
+    - bootstrap
+    
+- name: Set mesos master user permissions on the replicated log directory
+  sudo: yes
+  shell: chown {{ mesos_master_user }} /var/lib/mesos/replicated_log
+  tags:
+    - mesos
+    - bootstrap
+    
+- name: Set mesos master user permissions on the replicated log directory files
+  sudo: yes
+  shell: chown {{ mesos_master_user }} /var/lib/mesos/replicated_log/*
+  tags:
+    - mesos
+    - bootstrap
+    
+- name: Set mesos master user permissions on credential file
+  sudo: yes
+  shell: chown {{ mesos_master_user }} /etc/sysconfig/mesos-credentials
+  tags:
+    - mesos
+    - bootstrap    
+
 - name: install leader configuration
   sudo: yes
   yum:
