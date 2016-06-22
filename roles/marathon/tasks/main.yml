@@ -92,6 +92,15 @@
   tags:
     - marathon
 
+- name: give consul template privileges to run marathon ip tables
+  sudo: yes
+  copy:
+    dest: /etc/sudoers.d/consul-template-marathon-iptables-auth
+    content: |
+      consultemplate        ALL= NOPASSWD: /tmp/marathon-iptables.sh
+  tags:
+    - marathon
+
 - name: deploy iptables configuration
   sudo: yes
   copy:

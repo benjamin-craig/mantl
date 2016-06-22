@@ -7,6 +7,34 @@
   tags:
     - consul-template
     - bootstrap
+    
+- name: create consul-template user
+  sudo: yes
+  user:
+    name: "{{ consul_template_username }}"
+    state: present
+  tags:
+    - consul-template
+    
+- name: create consul-template service over ride directory
+  sudo: yes
+  file:
+    path: /etc/systemd/system/consul-template.service.d
+    state: directory
+  tags:
+    - consul-template
+
+- name: create consul-template service over ride
+  sudo: yes
+  copy:
+    dest: /etc/systemd/system/consul-template.service.d/user.conf
+    content: |
+      [Service]
+      User={{ consul_template_username }}
+  notify:
+    - reload systemd
+  tags:
+    - consul-template
 
 - name: configure consul-template
   sudo: yes
@@ -14,7 +42,7 @@
     src: consul.cfg.j2
     dest: /etc/consul-template/config.d/consul.hcl
   notify:
-    - reload consul-template
+    - restart consul-template
   tags:
     - consul-template
 

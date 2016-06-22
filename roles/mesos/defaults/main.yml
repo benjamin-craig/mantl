@@ -6,6 +6,8 @@ mesos_master_package: "mesos-master-{{ mesos_version }}"
 mesos_agent_package: "mesos-agent-{{ mesos_version }}"
 
 mesos_master_user: mesosmaster
+consul_template_username: consultemplate
+consul_template_mesos_leader_ip_tables: "ALL= NOPASSWD: /tmp/mesos-leader-iptables.sh"
 
 mesos_framework_users: 
   - marathon
