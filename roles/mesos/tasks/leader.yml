@@ -139,10 +139,9 @@
 
 - name: give consul template privileges to run mesos leader ip tables
   sudo: yes
-  copy:
+  template:
     dest: /etc/sudoers.d/consul-template-mesos-leader-iptables-auth
-    content: |
-      consultemplate        ALL= NOPASSWD: /tmp/mesos-leader-iptables.sh
+    src: consul-template-mesos-leader-iptables-auth.j2
   tags:
     - mesos
 
@@ -157,7 +156,7 @@
     - src: mesos-leader-iptables.tmpl
       dest: /etc/consul-template/templates
   notify:
-    - reload consul-template
+    - restart consul-template
   tags:
     - mesos
 

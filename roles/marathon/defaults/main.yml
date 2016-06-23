@@ -3,8 +3,7 @@ marathon_version: 0.13.0
 marathon_package: "marathon-{{ marathon_version }}"
 
 marathon_user: marathon
-consul_template_username: consultemplate
-consul_template_marathon_ip_tables: "ALL= NOPASSWD: /tmp/marathon-iptables.sh"
+consul_template_marathon_ip_tables: 'ALL= NOPASSWD: /tmp/marathon-iptables.sh'
 
 marathon_zk_auth: "{% if zk_marathon_user_secret is defined %}{{ zk_marathon_user }}:{{ zk_marathon_user_secret }}@{% endif %}"
 marathon_zk_dns: "zookeeper.service.{{ consul_dns_domain }}"

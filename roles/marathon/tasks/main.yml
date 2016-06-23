@@ -94,10 +94,10 @@
 
 - name: give consul template privileges to run marathon ip tables
   sudo: yes
-  copy:
+  template:
     dest: /etc/sudoers.d/consul-template-marathon-iptables-auth
-    content: |
-      consultemplate        ALL= NOPASSWD: /tmp/marathon-iptables.sh
+    src: consul-template-marathon-iptables-auth.j2
+    validate: visudo -c -f "%s"
   tags:
     - marathon
 
@@ -112,7 +112,7 @@
     - src: marathon-iptables.tmpl
       dest: /etc/consul-template/templates
   notify:
-    - reload consul-template
+    - restart consul-template
   tags:
     - marathon
 
