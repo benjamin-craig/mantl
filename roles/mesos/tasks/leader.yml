@@ -142,6 +142,7 @@
   template:
     dest: /etc/sudoers.d/consul-template-mesos-leader-iptables-auth
     src: consul-template-mesos-leader-iptables-auth.j2
+    validate: visudo -c -f "%s"
   tags:
     - mesos
 
